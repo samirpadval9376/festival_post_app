@@ -3,6 +3,7 @@ import 'dart:ui';
 
 import 'package:festival_post_app/controllers/festival_controller.dart';
 import 'package:festival_post_app/utils/festival_utils.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:image_gallery_saver/image_gallery_saver.dart';
@@ -37,6 +38,123 @@ class FestivalPage extends StatelessWidget {
           ),
         ),
         actions: [
+          IconButton(
+            onPressed: () {
+              showDialog(
+                context: context,
+                builder: (context) {
+                  return AlertDialog(
+                    title: Consumer<FestivalController>(
+                        builder: (context, provider, child) {
+                      return SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              "Change Text Colour :- ",
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                            SingleChildScrollView(
+                              scrollDirection: Axis.horizontal,
+                              child: Row(
+                                children: List.generate(
+                                  provider.colors.length,
+                                  (index) => GestureDetector(
+                                    onTap: () {
+                                      provider.changeColor(index: index);
+                                    },
+                                    child: Container(
+                                      height: 40,
+                                      width: 100,
+                                      margin: const EdgeInsets.all(5),
+                                      decoration: BoxDecoration(
+                                        color: provider.colors[index],
+                                        borderRadius: BorderRadius.circular(5),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(
+                              height: 10,
+                            ),
+                            const Text(
+                              "Text Align :- ",
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                            const SizedBox(
+                              height: 10,
+                            ),
+                            CupertinoSlidingSegmentedControl(
+                              children: const {
+                                TextAlign.start: Padding(
+                                  padding: EdgeInsets.all(15),
+                                  child: Icon(
+                                    Icons.format_align_left,
+                                  ),
+                                ),
+                                TextAlign.center: Padding(
+                                  padding: EdgeInsets.all(15),
+                                  child: Icon(
+                                    Icons.format_align_center,
+                                  ),
+                                ),
+                                TextAlign.end: Padding(
+                                  padding: EdgeInsets.all(15),
+                                  child: Icon(
+                                    Icons.format_align_right,
+                                  ),
+                                ),
+                              },
+                              groupValue: provider.textAlign,
+                              onValueChanged: (val) {
+                                provider.change(val: val);
+                              },
+                            ),
+                            const SizedBox(
+                              height: 10,
+                            ),
+                            const Text(
+                              "Text font weight :- ",
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                            const SizedBox(
+                              height: 10,
+                            ),
+                            Slider(
+                              min: 0,
+                              max: 8,
+                              divisions: 9,
+                              value: provider.weight.toDouble(),
+                              onChanged: (val) {
+                                provider.changeWeight(
+                                  val: val.toInt(),
+                                );
+                              },
+                            ),
+                          ],
+                        ),
+                      );
+                    }),
+                  );
+                },
+              );
+            },
+            icon: const Icon(
+              Icons.edit,
+            ),
+          ),
           IconButton(
             onPressed: () {
               showDialog(
@@ -121,12 +239,46 @@ class FestivalPage extends StatelessWidget {
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      IconButton(
+                        onPressed: () {
+                          provider.back(index: index);
+                        },
+                        icon: const Icon(
+                          Icons.arrow_back_ios,
+                          color: Colors.black,
+                        ),
+                      ),
+                      const Text(
+                        "Quote",
+                        style: TextStyle(
+                          fontSize: 22,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.black,
+                        ),
+                      ),
+                      IconButton(
+                        onPressed: () {
+                          provider.forward(index: index);
+                        },
+                        icon: const Icon(
+                          Icons.arrow_forward_ios,
+                          color: Colors.black,
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(
+                    height: s.height * 0.02,
+                  ),
                   RepaintBoundary(
                     key: imageKey,
                     child: Container(
                       height: s.height * 0.4,
                       width: s.width,
-                      padding: const EdgeInsets.all(35),
+                      padding: const EdgeInsets.all(10),
                       decoration: BoxDecoration(
                         color: Colors.white,
                         image: DecorationImage(
@@ -143,92 +295,34 @@ class FestivalPage extends StatelessWidget {
                         ],
                       ),
                       child: Column(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          const Spacer(
-                            flex: 3,
+                          const Spacer(),
+                          Text(
+                            "${allFestival[ind]['quote'][index]}",
+                            textAlign: provider.textAlign,
+                            style: TextStyle(
+                              color: provider.textColor,
+                              fontWeight: FontWeight.values[provider.weight],
+                              fontSize: 22,
+                            ),
                           ),
+                          const Spacer(),
                           Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
+                            mainAxisAlignment: MainAxisAlignment.end,
                             children: [
-                              IconButton(
-                                onPressed: () {
-                                  provider.back(index: index);
-                                },
-                                icon: const Icon(
-                                  Icons.arrow_back_ios,
-                                  color: Colors.white,
-                                ),
-                              ),
-                              const Text(
-                                "Quote",
+                              Text(
+                                "${allFestival[ind]['text']}",
                                 style: TextStyle(
+                                  color: provider.textColor,
+                                  fontWeight: FontWeight.bold,
                                   fontSize: 22,
-                                  fontWeight: FontWeight.w500,
-                                  color: Colors.white,
-                                ),
-                              ),
-                              IconButton(
-                                onPressed: () {
-                                  provider.forward(index: index);
-                                },
-                                icon: const Icon(
-                                  Icons.arrow_forward_ios,
-                                  color: Colors.white,
                                 ),
                               ),
                             ],
                           ),
-                          const SizedBox(
-                            height: 20,
-                          ),
-                          Text(
-                            "${allFestival[ind]['quote'][index]}",
-                            style: TextStyle(
-                              color: provider.textColor,
-                              fontWeight: FontWeight.w600,
-                              fontSize: 18,
-                            ),
-                          ),
-                          const Spacer(
-                            flex: 15,
-                          ),
+                          const Spacer(),
                         ],
-                      ),
-                    ),
-                  ),
-                  const SizedBox(
-                    height: 20,
-                  ),
-                  const Text(
-                    "Change Text Colour :- ",
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  const SizedBox(
-                    height: 20,
-                  ),
-                  SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: Row(
-                      children: List.generate(
-                        provider.colors.length,
-                        (index) => GestureDetector(
-                          onTap: () {
-                            provider.changeColor(index: index);
-                          },
-                          child: Container(
-                            height: 40,
-                            width: 100,
-                            margin: const EdgeInsets.all(5),
-                            decoration: BoxDecoration(
-                              color: provider.colors[index],
-                              borderRadius: BorderRadius.circular(5),
-                            ),
-                          ),
-                        ),
                       ),
                     ),
                   ),
@@ -276,6 +370,121 @@ class FestivalPage extends StatelessWidget {
               );
             },
           ),
+        ),
+      ),
+    );
+    SafeArea(
+      child: Scaffold(
+        body: Stack(
+          children: [
+            Container(
+              decoration: BoxDecoration(
+                image: DecorationImage(
+                  fit: BoxFit.cover,
+                  image: NetworkImage(
+                    allFestival[0]['image'],
+                  ),
+                ),
+              ),
+            ),
+            BackdropFilter(
+              filter: ImageFilter.blur(
+                sigmaX: 20,
+                sigmaY: 20,
+              ),
+              child: Container(),
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                IconButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  icon: const Icon(
+                    Icons.arrow_back_ios,
+                    color: Colors.white,
+                  ),
+                ),
+                const Text(
+                  "Festivals",
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+                IconButton(
+                  onPressed: () {},
+                  icon: const Icon(
+                    Icons.search,
+                    color: Colors.white,
+                  ),
+                ),
+              ],
+            ),
+            Align(
+              child: Container(
+                height: s.height * 0.8,
+                child: PageView.builder(
+                  itemCount: allFestival.length,
+                  itemBuilder: (context, index) {
+                    return Container(
+                      margin: const EdgeInsets.symmetric(
+                        horizontal: 4,
+                      ),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        image: DecorationImage(
+                          fit: BoxFit.fill,
+                          image: NetworkImage(
+                            allFestival[index]['image'],
+                          ),
+                        ),
+                      ),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(10),
+                        child: Stack(
+                          children: [
+                            Container(
+                              decoration: const BoxDecoration(
+                                gradient: LinearGradient(
+                                  begin: Alignment.topCenter,
+                                  colors: [
+                                    Colors.black,
+                                    Colors.black45,
+                                    Colors.transparent,
+                                  ],
+                                  stops: [0.0, 0.5, 1.0],
+                                ),
+                              ),
+                              child: Align(
+                                alignment: Alignment.bottomCenter,
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: List.generate(
+                                    allFestival.length,
+                                    (index) => Container(
+                                      width: 5,
+                                      height: 5,
+                                      decoration: BoxDecoration(
+                                        color: Colors.white,
+                                        shape: BoxShape.circle,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );

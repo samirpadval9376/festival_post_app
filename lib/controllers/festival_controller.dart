@@ -17,6 +17,19 @@ class FestivalController extends ChangeNotifier {
     notifyListeners();
   }
 
+  TextAlign textAlign = TextAlign.start;
+  int weight = 3;
+
+  change({required TextAlign? val}) {
+    textAlign = val!;
+    notifyListeners();
+  }
+
+  changeWeight({required int val}) {
+    weight = val;
+    notifyListeners();
+  }
+
   back({required int index}) {
     if (index != 0) {
       this.index--;
